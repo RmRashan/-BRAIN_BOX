@@ -20,10 +20,14 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'username',
+        'first_name',
+        'last_name',
+        'username',      // You might want to add a separate field for usernames
         'email',
         'password',
         'user_type',
+        'phone',
+        'image_url',
     ];
 
     /**
@@ -41,13 +45,9 @@ class User extends Authenticatable
      *
      * @var array<string, string>
      */
-
-     
-
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'user_type'=> UserType::class,
+        'user_type' => 'string', // Cast to string or use an Enum if applicable
     ];
-    
 }

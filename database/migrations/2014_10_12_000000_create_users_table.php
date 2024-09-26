@@ -14,13 +14,26 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+
+            // User information
+            $table->string('first_name');
+            $table->string('last_name');
             $table->string('username');
             $table->string('email')->unique();
+            $table->string('phone')->nullable(); // Optional phone number
+
+            // Image URL for profile picture
+            $table->string('image_url')->nullable(); // To store image URL, nullable if not mandatory
+
+            // Authentication-related columns
             $table->string('password');
-            $table->string('active')->nullable();
-            $table->string('auth_provider')->nullable();
-            // $table->enum('user_type', UserType::values()->map(fn($type) => $type->name)->toArray());
-            $table->enum('user_type', array_column(UserType::cases(), 'value'));
+            $table->boolean('active')->default(true);
+            $table->string('auth_provider')->nullable(); // Social login provider
+
+            // Enum for user_type
+            $table->enum('user_type', array_column(UserType::cases(), 'value')); // Enum for user type
+
+            // Timestamps
             $table->timestamps();
         });
     }

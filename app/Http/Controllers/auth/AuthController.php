@@ -43,7 +43,7 @@ class AuthController extends Controller
             $user = User::where('username', $request->username)->first();
 
 
-       
+
 
             return response()->json([
                 'authentication' => 'success'
@@ -56,45 +56,58 @@ class AuthController extends Controller
         }
     }
 
-    public function  register(Request $request)
+    public function register(Request $request)
     {
-
-
-        $request->username ;
+        // Define validation rules
         $rules = [
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-                'password' => 'required',
-                'user_type' => 'required',
-            ];
+            'password' => 'required|string|min:8',
+            'phone' => 'nullable|string',
+            'userType' => 'required|in:student,teacher,admin', // Example user types
+            'paymentReceipt' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation for file upload
+        ];
 
-
+        // Validate the request
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
                 'error' => $validator->errors()
             ], 400);
-        } else {
-
-
-
-            $user = User::create([
-                'username' => $request->email,
-                'email' => $request->email,
-                'user_type' => $request->user_type,
-                'password' => Hash::make($request->password),
-            ]);
-            $token = $user->createToken('authToken');
-
-
-            return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
-                'status' => 'success'
-            ]);
         }
-    
+
+        // Handle file upload
+        $imageUrl = null; // Initialize image URL
+        if ($request->hasFile('paymentReceipt')) {
+            $imagePath = $request->file('paymentReceipt')->store('uploads', 'public'); // Store file in 'storage/app/public/uploads'
+            $imageUrl = asset('storage/' . $imagePath); // Generate the public URL for the image
+        }
+
+        // Create user
+        $user = User::create([
+            'first_name' => $request->firstName,
+            'last_name' => $request->lastName,
+            'username' => $request->email,  // Optional field
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'user_type' => $request->userType,
+            'image_url' => $imageUrl, // Store the image URL if uploaded
+        ]);
+
+        // Generate token
+        $token = $user->createToken('authToken')->accessToken; // Get the access token
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+            'status' => 'success'
+        ]);
     }
+
+
     public function  logout() {}
 }
