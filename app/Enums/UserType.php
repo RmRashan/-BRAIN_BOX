@@ -9,4 +9,9 @@ enum UserType: string
     case Student = 'student';
     case HEStudent = 'he_student';
     case Agent = 'agent';
+
+    public static function values(): array
+    {
+        return self::cases();
+    }
 }

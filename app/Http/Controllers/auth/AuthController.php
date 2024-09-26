@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,6 +14,7 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
+
 
         $credentials = [
             'username' => $request->username,
@@ -40,8 +42,11 @@ class AuthController extends Controller
 
             $user = User::where('username', $request->username)->first();
 
+
+       
+
             return response()->json([
-                'ok' => 'ok'
+                'authentication' => 'success'
             ], 200);
 
         } else {
@@ -55,12 +60,12 @@ class AuthController extends Controller
     {
 
 
-
+        $request->username ;
         $rules = [
-            'username' =>'required|unique:users',
-            'password' => 'required',
             'email' => 'required|email|unique:users',
-        ];
+                'password' => 'required',
+                'user_type' => 'required',
+            ];
 
 
         $validator = Validator::make($request->all(), $rules);
@@ -74,8 +79,9 @@ class AuthController extends Controller
 
 
             $user = User::create([
-                'username' => $request->username,
+                'username' => $request->email,
                 'email' => $request->email,
+                'user_type' => $request->user_type,
                 'password' => Hash::make($request->password),
             ]);
             $token = $user->createToken('authToken');
@@ -87,9 +93,8 @@ class AuthController extends Controller
                 'user' => $user,
                 'status' => 'success'
             ]);
-
-
         }
+    
     }
     public function  logout() {}
 }

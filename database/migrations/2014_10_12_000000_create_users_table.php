@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,8 +19,8 @@ return new class extends Migration
             $table->string('password');
             $table->string('active')->nullable();
             $table->string('auth_provider')->nullable();
-            $table->string('user_type')->nullable();
-            $table->rememberToken();
+            // $table->enum('user_type', UserType::values()->map(fn($type) => $type->name)->toArray());
+            $table->enum('user_type', array_column(UserType::cases(), 'value'));
             $table->timestamps();
         });
     }
