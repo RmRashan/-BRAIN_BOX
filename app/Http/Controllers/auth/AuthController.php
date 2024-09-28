@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -81,8 +82,14 @@ class AuthController extends Controller
         // Handle file upload
         $imageUrl = null; // Initialize image URL
         if ($request->hasFile('paymentReceipt')) {
-            $imagePath = $request->file('paymentReceipt')->store('uploads', 'public'); // Store file in 'storage/app/public/uploads'
-            $imageUrl = asset('storage/' . $imagePath); // Generate the public URL for the image
+
+            $imageName = $request->userType. "_". $request->email . ".". $request->paymentReceipt->guessExtension();// usetTyep+username+imagextention
+            
+             Storage::disk('publicuploads')->put($imageName, file_get_contents($request->paymentReceipt));  // Store file in 'storage/app/public/'
+
+            // $path = Storage::put('images/'. $imageName, $request->file('paymentReceipt'));
+            // $imagePath = $request->file('paymentReceipt')->store('uploads', 'public'); // Store file in 'storage/app/public/uploads'
+            //  $imageUrl = asset('storage/' . $imageName); // Generate the public URL for the image
         }
 
         // Create user
@@ -94,7 +101,7 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'user_type' => $request->userType,
-            'image_url' => $imageUrl, // Store the image URL if uploaded
+            'image_url' =>$imageName, // Store the image URL if uploaded
         ]);
 
         // Generate token

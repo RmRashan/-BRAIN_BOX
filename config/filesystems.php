@@ -27,8 +27,13 @@ return [
     | Supported Drivers: "local", "ftp", "sftp", "s3"
     |
     */
-
+ 
     'disks' => [
+        'publicuploads' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/uploads'),
+            'visibility' => 'public',
+        ],
 
         'local' => [
             'driver' => 'local',
