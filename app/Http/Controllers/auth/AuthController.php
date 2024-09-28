@@ -65,7 +65,7 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
             'phone' => 'nullable|string',
-            'userType' => 'required|in:student,teacher,admin', // Example user types
+            'userType' => 'required|in:student,he_student,instructor,agent',
             'paymentReceipt' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation for file upload
         ];
 
