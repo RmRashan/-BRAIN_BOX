@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -43,12 +42,18 @@ class AuthController extends Controller
 
             $user = User::where('username', $request->username)->first();
 
-
-
+            // Generate token
+            $token = $user->createToken('authToken')->accessToken; // Get the access token
 
             return response()->json([
-                'authentication' => 'success'
-            ], 200);
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'user' => $user,
+                    'status' => 'success'
+                ]);
+
+
+          
 
         } else {
             return response()->json([
@@ -83,7 +88,7 @@ class AuthController extends Controller
         $imageUrl = null; // Initialize image URL
         if ($request->hasFile('paymentReceipt')) {
 
-            $imageName = $request->userType. "_". $request->email . ".". $request->paymentReceipt->guessExtension();// usetTyep+username+imagextention
+            $imageName = time(). "_".$request->userType. "_". $request->email . ".". $request->paymentReceipt->guessExtension();// usetTyep+username+imagextention
             
              Storage::disk('publicuploads')->put($imageName, file_get_contents($request->paymentReceipt));  // Store file in 'storage/app/public/'
 
@@ -116,5 +121,14 @@ class AuthController extends Controller
     }
 
 
-    public function  logout() {}
+    public function  users() {
+
+        $user = Auth::user();
+
+        return response()->json([
+            'user' => $user,
+            'status' => 'success'
+        ]);
+
+    }
 }
