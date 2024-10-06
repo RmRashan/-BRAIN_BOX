@@ -67,7 +67,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
             'phone' => 'nullable|string',
             'userType' => 'required|in:student,he_student,instructor,agent',
-            'paymentReceipt' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation for file upload
+            'paymentReceipt' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
 
         // Validate the request
@@ -79,18 +79,32 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // Handle file upload
-        $imageUrl = null; // Initialize image URL
-        if ($request->hasFile('paymentReceipt')) {
+        $imageUrl = null;
+        $imageName = null;
+        if ($request->hasFile('paymentReceipt') && $request->file('paymentReceipt')->isValid()) {
+            $imageName = $request->userType . "_" . $request->email . "." . $request->file('paymentReceipt')->guessExtension();
 
-            $imageName = $request->userType. "_". $request->email . ".". $request->paymentReceipt->guessExtension();// usetTyep+username+imagextention
-            
-             Storage::disk('publicuploads')->put($imageName, file_get_contents($request->paymentReceipt));  // Store file in 'storage/app/public/'
-
-            // $path = Storage::put('images/'. $imageName, $request->file('paymentReceipt'));
-            // $imagePath = $request->file('paymentReceipt')->store('uploads', 'public'); // Store file in 'storage/app/public/uploads'
-            //  $imageUrl = asset('storage/' . $imageName); // Generate the public URL for the image
+            if (Storage::disk('publicuploads')->put($imageName, file_get_contents($request->file('paymentReceipt')))) {
+                $imageUrl = Storage::disk('publicuploads')->url($imageName);
+            }
         }
+
+
+
+
+
+//        // Handle file upload
+//        $imageUrl = null; // Initialize image URL
+//        if ($request->hasFile('paymentReceipt')) {
+//
+//            $imageName = $request->userType. "_". $request->email . ".". $request->paymentReceipt->guessExtension();// usetTyep+username+imagextention
+//
+//             Storage::disk('publicuploads')->put($imageName, file_get_contents($request->paymentReceipt));  // Store file in 'storage/app/public/'
+//
+//            // $path = Storage::put('images/'. $imageName, $request->file('paymentReceipt'));
+//            // $imagePath = $request->file('paymentReceipt')->store('uploads', 'public'); // Store file in 'storage/app/public/uploads'
+//            //  $imageUrl = asset('storage/' . $imageName); // Generate the public URL for the image
+//        }
 
         // Create user
         $user = User::create([
