@@ -27,6 +27,7 @@ return new class extends Migration
 
             // Authentication-related columns
             $table->string('password');
+            $table->string('promoCode');
             $table->boolean('active')->default(true);
             $table->string('auth_provider')->nullable(); // Social login provider
 

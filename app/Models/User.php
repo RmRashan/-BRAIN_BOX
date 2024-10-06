@@ -25,6 +25,7 @@ class User extends Authenticatable
         'username',      // You might want to add a separate field for usernames
         'email',
         'password',
+        'promoCode',
         'user_type',
         'phone',
         'image_url',
